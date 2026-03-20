@@ -8,6 +8,8 @@
 # Imports 
 #####################################################################################################################################################
 import argparse
+from PIL import Image
+import numpy as np
 
 
 # Functions
@@ -21,7 +23,7 @@ def calculate_stitches(expected_stitches: float,  actual_stitches: float, patter
 
     # If you also want to knit in between a size for width on a pattern
     # For example, you want sweater bust size to be 102 cm, but the pattern only has sizes for 100 and 110 cm
-    if expected_width != 0 and desired_width != 0:
+    if expected_width not in (None, 0) and desired_width not in (None, 0):
         adjusted_caston_stitches = (pattern_cast_on_stitches * desired_width) / expected_width
         width_of_expected_caston = (adjusted_caston_stitches/expected_gauge)
 
@@ -51,11 +53,94 @@ def calculate_new_bust_circumference(stitch_gauge: float, total_bust_stitches: i
     # Calculate new bust width
     return(total_bust_stitches/(stitch_gauge/10))
 
+def load_crochet_graph(path):
+    '''
+        This function takes a path to an image file of a crochet grid and loads it into a numpy array of the colors.
+
+        Inputs:
+            * path: This is the path to the image file (in jpg, png, or pdf format)
+        Returns:
+            numpy array of the image
+    '''
+    img = Image.open(path).convert("RGB")
+    print(img)
+    return np.array(img)
+
+def image_to_grid(img, rows, cols):
+    margin = 2
+    h, w, _ = img.shape
+    
+    cell_h = h // rows
+    cell_w = w // cols
+    
+    grid = []
+    
+    for r in range(rows):
+        row = []
+        for c in range(cols):
+            cell = img[
+                r*cell_h+margin:(r+1)*cell_h-margin,
+                c*cell_w+margin:(c+1)*cell_w-margin
+            ]
+            
+            color = get_block_color(cell)
+            row.append(color)
+        
+        grid.append(row)
+    
+    return grid
+
+def simplify_color(color, step=40):
+    return tuple((c // step) * step for c in color)
+
+def get_block_color(block):
+    pixels = block.reshape(-1, 3)
+
+    # Count dominant color
+    colors, counts = np.unique(pixels, axis = 0, return_counts=True)
+    dominant = colors[np.argmax(counts)]
+
+    return simplify_color(dominant)
 
 
-# def get_args():
-#     parser = argparse.ArgumentParser(description = 'Module containing helpful functions for knitting or crochet projects.')
-#     parser.add_argument('-w', )
+def get_unique_colors(grid):
+    unique = set()
+    for row in grid:
+        for color in row:
+            unique.add(tuple(color))
+    return(sorted(list(unique)))
+
+def rgb_to_hex(rgb):
+    return '#%02x%02x%02x' % rgb
+
+def row_to_instruction(row, color_map):
+    instructions = []
+
+    
+    current_color = tuple(row[0])
+    count = 1
+    
+    for pixel in row[1:]:
+        pixel = tuple(pixel)
+        
+        if pixel == current_color:
+            count += 1
+        else:
+            instructions.append((count, color_map[current_color]))
+            current_color = pixel
+            count = 1
+    
+    instructions.append((count, color_map[current_color]))
+    
+    return instructions
+
+def format_row(row_num, instruction):
+    parts = [f"{count} {color}" for count, color in instruction]
+    return f"Row {row_num}: " + ", ".join(parts)
+
+
+# def write_crochet_grid_instructions():
+
 
     
 
@@ -64,7 +149,9 @@ def calculate_new_bust_circumference(stitch_gauge: float, total_bust_stitches: i
 #####################################################################################################################################################
 
 def main():
-    print(calculate_stitches(16, 10, 11, 68, 100, 102))
+    image = load_crochet_graph('/Users/annagracewelch/knitting_code/simple_graph.jpg')
+    grid = image_to_grid(image, 29, 29)
+    print(get_unique_colors(grid))
 
 
 
