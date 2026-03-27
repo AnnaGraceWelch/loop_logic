@@ -19,7 +19,7 @@ def rgb_to_hex(rgb):
 
 # Style Set-Up
 #####################################################################################################################################################
-ui.page_opts(title="Knitting Calculator",
+ui.page_opts(title="LoopLogic",
              fillable=True)
 
 ui.tags.style("""
