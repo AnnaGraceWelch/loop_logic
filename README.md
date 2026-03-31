@@ -1,4 +1,6 @@
-![LoopLogic Logo](Loop_Logic_large_logo.png)
+<p align="center">
+  <img src="Loop_Logic_large_logo.png" width="350">
+</p>
 
 LoopLogic is a Shiny application designed to support crocheters and knitters through multiple stages of the crafting process. 
 
