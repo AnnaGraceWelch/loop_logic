@@ -52,94 +52,70 @@ def calculate_new_bust_circumference(stitch_gauge: float, total_bust_stitches: i
 
     # Calculate new bust width
     return(total_bust_stitches/(stitch_gauge/10))
+    
+from PIL import Image
+import numpy as np
 
 def load_crochet_graph(path):
     '''
-        This function takes a path to an image file of a crochet grid and loads it into a numpy array of the colors.
-
-        Inputs:
-            * path: This is the path to the image file (in jpg, png, or pdf format)
-        Returns:
-            numpy array of the image
+    Load an image (PNG) where each pixel is a stitch.
+    Returns a numpy array of RGB values.
     '''
     img = Image.open(path).convert("RGB")
-    print(img)
     return np.array(img)
 
-def image_to_grid(img, rows, cols):
-    margin = 2
+def image_to_grid(img):
+    '''
+    Convert the image array into a grid where each element is the simplified color of a pixel.
+    '''
     h, w, _ = img.shape
-    
-    cell_h = h // rows
-    cell_w = w // cols
-    
     grid = []
-    
-    for r in range(rows):
+
+    for r in range(h):
         row = []
-        for c in range(cols):
-            cell = img[
-                r*cell_h+margin:(r+1)*cell_h-margin,
-                c*cell_w+margin:(c+1)*cell_w-margin
-            ]
-            
-            color = get_block_color(cell)
+        for c in range(w):
+            color = simplify_color(tuple(img[r, c]))
             row.append(color)
-        
         grid.append(row)
     
     return grid
 
 def simplify_color(color, step=40):
+    '''
+    Reduce color variation to discrete steps for easier mapping to yarn colors.
+    '''
     return tuple((c // step) * step for c in color)
-
-def get_block_color(block):
-    pixels = block.reshape(-1, 3)
-
-    # Count dominant color
-    colors, counts = np.unique(pixels, axis = 0, return_counts=True)
-    dominant = colors[np.argmax(counts)]
-
-    return simplify_color(dominant)
-
 
 def get_unique_colors(grid):
     unique = set()
     for row in grid:
         for color in row:
             unique.add(tuple(color))
-    return(sorted(list(unique)))
+    return sorted(list(unique))
 
 def rgb_to_hex(rgb):
     return '#%02x%02x%02x' % rgb
 
 def row_to_instruction(row, color_map):
     instructions = []
-
-    
-    current_color = tuple(row[0])
+    current_color = row[0]
     count = 1
-    
+
     for pixel in row[1:]:
-        pixel = tuple(pixel)
-        
         if pixel == current_color:
             count += 1
         else:
             instructions.append((count, color_map[current_color]))
             current_color = pixel
             count = 1
-    
+
     instructions.append((count, color_map[current_color]))
-    
     return instructions
 
 def format_row(row_num, instruction):
     parts = [f"{count} {color}" for count, color in instruction]
     return f"Row {row_num}: " + ", ".join(parts)
 
-
-# def write_crochet_grid_instructions():
 
 
     

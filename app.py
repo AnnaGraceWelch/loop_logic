@@ -87,13 +87,65 @@ with ui.div(style="max-width: 800px; margin: auto;"):
             )
 
 # ------------------------------- Page 2 --------------------------------------------------------------------------------------------------------------------------
-        with ui.nav_panel("Stitch Calculator"):
+        with ui.nav_panel("Cast-on Stitch Calculator"):
 
-                # ui.input_numeric("expected_stitches", "Expected Gauge (Stitches per 10 cm)", 0)
-                # ui.input_numeric("actual_stitches", "Actual Gauge (Stitches per 10 cm)", 0)
-                # ui.input_numeric("pattern_caston_sts", "Number of Cast-on Stitches for Desired Pattern Size", 0)
-                # ui.input_numeric("expected_width", "Expected Bust Width of Sweater based on Pattern", value=None)
-                # ui.input_numeric("desired_width", "Desired Bust Width of Sweater", value=None)
+            with ui.card(style="max-width:850px; margin:auto;", class_="p-4"):
+
+                ui.card_header("About the Cast-on Stitch Calculator")
+
+                ui.markdown("""
+                                This calculator computes the cast-on stitches needed to reach pattern gauge.  
+                                It can also calculate stitches required to achieve a desired bust measurement.
+
+                                ---
+                                ## Required Inputs
+
+                                ### Pattern Gauge
+                                - Stitch gauge written in the pattern (stitches per 10 cm).
+
+                                **Example:**  
+                                17 sts × 26 rows = 10 × 10 cm → Input: **17**
+
+                                ---
+
+                                ### Your Gauge
+                                - Stitch gauge measured from your knitted swatch **after** blocking.
+
+                                **Example:**  
+                                18 sts = 10 cm → Input: **18**
+
+                                ---
+
+                                ### Cast-On Stitches
+                                - Number of stitches to cast on specified by the pattern.
+
+                                **Example:**  
+                                Pattern says cast on **92 stitches** → Input: **92**
+
+                                ---
+                                ## Optional Inputs
+
+                                ### (Optional) Pattern Bust Circumference
+                                - Finished garment bust size listed in the pattern.
+
+                                **Example:**  
+                                Size S = **113 cm** → Input: **113**
+
+                                ---
+
+                                ### (Optional) Desired Bust Circumference
+                                - Target bust size for the finished garment.
+
+                                **Example:**  
+                                You want a bust circumference of **115 cm** instead of 113 cm → Input: **115**
+
+                                This is an optional input because if your desired measurement matches another pattern size's dimensions, 
+                                                knitting that size is usually simpler than making your own calculations. 
+
+                                ---
+
+                                Enter required values (and optional values if needed) to calculate your cast-on stitches.
+            """)
 
             with ui.card():
                 ui.card_header("Gauge")
@@ -108,8 +160,8 @@ with ui.div(style="max-width: 800px; margin: auto;"):
             with ui.card():
                 ui.card_header("Optional Size Adjustment")
                 with ui.layout_columns():
-                    ui.input_numeric("expected_width", "Pattern bust width (optional)", value=None)
-                    ui.input_numeric("desired_width", "Desired bust width (optional)", value=None)
+                    ui.input_numeric("expected_width", "Pattern bust circumference (optional)", value=None)
+                    ui.input_numeric("desired_width", "Desired bust circumference (optional)", value=None)
 
 
 
@@ -155,10 +207,41 @@ with ui.div(style="max-width: 800px; margin: auto;"):
 
         
             
-# ------------------------------- Page 3: Changed Bust Circumference --------------------------------------------------------------------------------------------------------------------------
-        with ui.nav_panel('Changed Bust Circumference'):
-            ui.input_numeric("stitch_gauge", "Stitches per 10 cm", 0)
-            ui.input_numeric("total_bust_stitches", "Total stitches around bust at widest point in pattern", 0)
+# ------------------------------- Page 3: Bust Circumference Calculator --------------------------------------------------------------------------------------------------------------------------
+        with ui.nav_panel('Bust Circumference Calculator'):
+
+            with ui.card(style="max-width:850px; margin:auto;", class_="p-4"):
+                ui.card_header("About the Bust Circumference Calculator")
+
+                ui.markdown("""
+                                This calculator computes the bust circumference in cm of a finished garment if you knit with a different stitch gauge than the pattern gauge.  
+
+                                ---
+                                ## Required Inputs
+
+                                ### Your Stitch Gauge
+                                - Stitch gauge of your knitted swatch **after** blocking. 
+
+                                **Example:**  
+                                18 sts × 26 rows = 10 × 10 cm → Input: **18**
+
+                                ---
+
+                                ### Total stitches around bust at widest point in pattern
+                                - Stitches at the widest point of the pattern's body section after all increases. 
+
+                                **Example:**  
+                                At the end of body increases, you should have **192 stitches** on the needles. → Input: **192**
+                            
+                                ---
+                            
+                                Enter required values to calculate the bust circumference of finished garment if knit with your stitch gauge.
+                            """)
+
+            with ui.card():
+                ui.card_header("Inputs")
+                ui.input_numeric("stitch_gauge", "Stitch gauge (stitches per 10 cm)", 0)
+                ui.input_numeric("total_bust_stitches", "Total stitches around bust at widest point in pattern", 0)
 
             @render.text
             def new_bust_circumference():
@@ -181,42 +264,60 @@ with ui.div(style="max-width: 800px; margin: auto;"):
 
 
 # ------------------------------- Page 4: Crochet Graph --------------------------------------------------------------------------------------------------------------------------
-        # image = load_crochet_graph('/Users/annagracewelch/knitting_code/simple_graph.jpg')
-        # grid = image_to_grid(image, 29, 29)
+# This page is an interactive interface where users can input a crochet colorwork grid, and it outputs the written instructions in the format:
+    # Row 1: 2 white, 1 black, 2 white
+    # Row 2: 3 white, 2 black, 3 white
+# Every odd row is crocheted from left to right, and every even row is crocheted from right to left. 
         with ui.nav_panel('Crochet Graph'):
+            with ui.card(style="max-width:850px; margin:auto;", class_="p-4"):
+                ui.card_header("About the Bust Circumference Calculator")
+
+                ui.markdown("""
+                                This page creates written instructions from a crochet colorwork graph.  
+
+                                ---
+                                ## Required Inputs
+
+                                ### Graph File Input
+                                - Image file containing **only** your crochet graph in PNG format where one pixel = one stitch. 
+                            
+                                **Example input image:**""")
+
+                ui.img(src="heart_grid.png", width='29px')
+                        
+                ui.markdown("""
+                                This is best done by inputting your graph into the website StitchFiddle and utilizing the download to .png option.
+
+                                **Tip:** Make sure that the colors on StitchFiddle match your expected colors and number of colors. If it is recognizing more colors than yarn colors you intend to use,
+                                merge some colors before downloading the PNG file.
+                                                    """)
             with ui.card():
                 ui.card_header('Graph File Input')
                 with ui.div(class_="d-flex justify-content-center align-items-center", style="height: 100%;"):
                     ui.input_file('graph', 'Input file containing crochet graph. Make sure there are no numbers numbering rows or columns and that the file only contains the grid of color.')
-            with ui.card():
-                ui.card_header('Dimensions')
-                ui.input_numeric('rows', 'Input number of overall rows in graph.', 1)
-                ui.input_numeric('columns', 'Input number of overall columns in graph.', 1)
 
             def compute_grid():
                 file = input.graph()
-                rows = input.rows()
-                columns = input.columns()
-                if file == None or rows == None or columns == None:
+                if file is None:
                     return None
+
                 image = load_crochet_graph(file[0]["datapath"])
-                return image_to_grid(image, rows, columns)
-            
+                grid = image_to_grid(image)  # no rows/columns needed
+                return grid
+
             @render.text
             def graph_input():
-                if compute_grid() == None: 
-                    return 'Please input file and dimensions.'
+                if compute_grid() is None: 
+                    return 'Please input a PNG file.'
                 return "Graph loaded successfully."
-            
 
-    
             @render.ui
             def color_naming_ui():
                 grid = compute_grid()
-                if grid == None:
+                if grid is None:
                     return
 
-                colors = get_unique_colors(grid)  # your reactive grid
+                colors = get_unique_colors(grid)  # reactive unique colors
                 
                 return ui.div(
                     *[
@@ -236,28 +337,26 @@ with ui.div(style="max-width: 800px; margin: auto;"):
                         for i, color in enumerate(colors)
                     ]
                 )
+
             def get_color_map(colors):
                 color_map = {}
-                
                 for i, color in enumerate(colors):
                     name = input[f"color_{i}"]()
                     color_map[tuple(color)] = name
-                
                 return color_map
-        
+
             @render.ui
             def pattern_output():
                 grid = compute_grid()
-                if grid == None:
+                if grid is None:
                     return
                 
                 colors = get_unique_colors(grid)
                 color_map = get_color_map(colors)
                 
                 lines = []
-                
                 for i, row in enumerate(grid):
-                    # zig zag rows (even numbered rows go from right to left)
+                    # zig-zag rows (even numbered rows go from right to left)
                     if i % 2 == 1:
                         row = row[::-1]
 
