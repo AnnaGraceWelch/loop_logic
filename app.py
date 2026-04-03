@@ -284,70 +284,123 @@ with ui.div(style="max-width: 800px; margin: auto;"):
 
 
 # ------------------------------- Page 4: Crochet Colorwork Grid Written Instruction Generator --------------------------------------------------------------------------------------------------------------------------
-# This page is an interactive interface where users can input a crochet colorwork grid, and it outputs the written instructions in the format:
-    # Row 1: 2 white, 1 black, 2 white
-    # Row 2: 3 white, 2 black, 3 white
-# Every odd row is crocheted from left to right, and every even row is crocheted from right to left. 
+        # Navigation panel containing the crochet instruction generator
         with ui.nav_panel('Crochet Colorwork Grid Written Instruction Generator'):
+
+            # --------------------------------------------------------
+            # INFORMATION / ABOUT CARD
+            # --------------------------------------------------------
+            # Provides user instructions explaining required inputs
             with ui.card(style="max-width:850px; margin:auto;", class_="p-4"):
                 ui.card_header("About the Bust Circumference Calculator")
 
                 ui.markdown("""
-                                This page creates written instructions from a crochet colorwork graph.  
+                This page creates written instructions from a crochet colorwork graph.
 
-                                ---
-                                ## Required Inputs
+                ---
+                ## Required Inputs
 
-                                ### Graph File Input
-                                - Image file containing **only** your crochet graph in PNG format where one pixel = one stitch. 
-                            
-                                **Example input image:**""")
+                ### Graph File Input
+                - Image file containing **only** your crochet graph in PNG format
+                where one pixel = one stitch.
 
+                **Example input image:**""")
+
+                # Example image showing correct input format
                 ui.img(src="heart_grid.png", width='29px')
-                        
-                ui.markdown("""
-                                This is best done by inputting your graph into the website StitchFiddle and utilizing the download to .png option.
 
-                                **Tip:** Make sure that the colors on StitchFiddle match your expected colors and number of colors. If it is recognizing more colors than yarn colors you intend to use,
-                                merge some colors before downloading the PNG file.
-                                                    """)
+                ui.markdown("""
+                This is best done by inputting your graph into StitchFiddle
+                and downloading the design as a PNG file.
+
+                **Tip:** Ensure colors match intended yarn colors.
+                Merge similar colors before exporting if needed.
+                """)
+
+            # --------------------------------------------------------
+            # FILE INPUT CARD
+            # --------------------------------------------------------
+            # Allows user to upload crochet graph PNG
             with ui.card():
                 ui.card_header('Graph File Input')
-                with ui.div(class_="d-flex justify-content-center align-items-center", style="height: 100%;"):
-                    ui.input_file('graph', 'Input file containing crochet graph. Make sure there are no numbers numbering rows or columns and that the file only contains the grid of color.')
 
+                # Center file upload widget
+                with ui.div(
+                    class_="d-flex justify-content-center align-items-center",
+                    style="height: 100%;"
+                ):
+                    ui.input_file(
+                        'graph',
+                        'Input file containing crochet graph. '
+                        'Image must contain only the grid (no numbering).'
+                    )
+
+            # --------------------------------------------------------
+            # REACTIVE GRID COMPUTATION
+            # --------------------------------------------------------
+            # Converts uploaded PNG into a structured color grid
+            # This function is called reactively whenever input.graph changes
             def compute_grid():
                 file = input.graph()
+
+                # No file uploaded yet
                 if file is None:
                     return None
 
+                # Load image as RGB array
                 image = load_crochet_graph(file[0]["datapath"])
-                grid = image_to_grid(image)  # no rows/columns needed
+
+                # Convert pixels → stitch color grid
+                grid = image_to_grid(image)
+
                 return grid
 
+            # --------------------------------------------------------
+            # FILE STATUS MESSAGE
+            # --------------------------------------------------------
+            # Displays confirmation once graph loads successfully
             @render.text
             def graph_input():
-                if compute_grid() is None: 
+                if compute_grid() is None:
                     return 'Please input a PNG file.'
                 return "Graph loaded successfully."
 
+            # --------------------------------------------------------
+            # DYNAMIC COLOR NAMING UI
+            # --------------------------------------------------------
+            # Automatically generates text boxes allowing user
+            # to assign yarn/color names to detected grid colors.
             @render.ui
             def color_naming_ui():
+
                 grid = compute_grid()
                 if grid is None:
                     return
 
-                colors = get_unique_colors(grid)  # reactive unique colors
-                
+                # Extract unique RGB colors from image
+                colors = get_unique_colors(grid)
+
+                # Create UI row for each detected color
                 return ui.div(
                     *[
                         ui.div(
                             {
-                                "style": "display:flex; align-items:center; gap:10px; margin-bottom:8px;"
+                                "style": (
+                                    "display:flex; align-items:center;"
+                                    " gap:10px; margin-bottom:8px;"
+                                )
                             },
+
+                            # Color preview square
                             ui.div({
-                                "style": f"width:25px; height:25px; background:{rgb_to_hex(color)}; border:1px solid black;"
+                                "style": (
+                                    f"width:25px; height:25px;"
+                                    f" background:{rgb_to_hex(color)};"
+                                    " border:1px solid black;"
+                                )
                             }),
+
+                            # User-entered yarn/color name
                             ui.input_text(
                                 f"color_{i}",
                                 f"Color {i+1}",
@@ -358,29 +411,53 @@ with ui.div(style="max-width: 800px; margin: auto;"):
                     ]
                 )
 
+            # --------------------------------------------------------
+            # BUILD COLOR MAP
+            # --------------------------------------------------------
+            # Creates mapping:
+            # RGB color → user-defined color name
             def get_color_map(colors):
+
                 color_map = {}
+
                 for i, color in enumerate(colors):
                     name = input[f"color_{i}"]()
                     color_map[tuple(color)] = name
+
                 return color_map
 
+            # --------------------------------------------------------
+            # PATTERN INSTRUCTION GENERATION
+            # --------------------------------------------------------
+            # Converts grid rows into written crochet instructions
             @render.ui
             def pattern_output():
+
                 grid = compute_grid()
                 if grid is None:
                     return
-                
+
                 colors = get_unique_colors(grid)
                 color_map = get_color_map(colors)
-                
+
                 lines = []
-                for i, row in enumerate(grid):
-                    # zig-zag rows (even numbered rows go from right to left)
+
+                # Iterate through rows of stitches
+                # Starting from bottom to top 
+                for i, row in enumerate(grid[::-1]):
+
+                    # Crochet is worked in rows:
+                    # odd rows → left to right
+                    # even rows → right to left
+                    # (zig-zag / turning work)
                     if i % 2 == 1:
                         row = row[::-1]
 
+                    # Convert row colors to instruction string
                     instr = row_to_instruction(row, color_map)
-                    lines.append(format_row(i+1, instr))
-                
+
+                    # Add formatted row label
+                    lines.append(format_row(i + 1, instr))
+
+                # Display instructions as preformatted text block
                 return ui.pre("\n".join(lines))
