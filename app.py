@@ -75,14 +75,34 @@ with ui.div(style="max-width: 800px; margin: auto;"):
     with ui.navset_card_pill():
         
 # ------------------------------- Page 1 --------------------------------------------------------------------------------------------------------------------------
-        with ui.nav_panel("About / Help"):
+        with ui.nav_panel("Welcome"):
             ui.markdown(
                 """
-                ### How this app works
-                - Uses your actual stitch gauge
-                - Calculates a new cast-on to hit your desired bust size
+                ## 🧶 **Welcome to LoopLogic!** 🧶
+                
+                ### What is LoopLogic?
+                - LoopLogic is an interactive application designed to aid knitters and crocheters in the crafting process.
+                    It includes helpful features such as stitch calculators and written instruction generators.
+                    The current features are detailed in the sections below. 
+            
 
-                    Happy knitting!
+                    Happy crafting! 😊
+
+                ---
+
+                ### Features:
+
+                #### Cast-on Stitch Calculator
+                - Calculates the cast-on stitches needed for garment to be a certain pattern size if user's gauge is different than pattern gauge.
+                - Also has the option to calculate cast-on stitches is user desires a bust circumference different than the pattern's sizes.
+                    
+                #### Bust Circumference Calculator
+                - Calculates the bust circumference of a specific garment from a pattern based on user's stitch gauge. 
+                    
+                #### Crochet Colorwork Grid Written Instruction Generator
+                - Generates written instructions from a crochet colorwork grid                        
+
+    
                 """
             )
 
@@ -263,12 +283,12 @@ with ui.div(style="max-width: 800px; margin: auto;"):
 
 
 
-# ------------------------------- Page 4: Crochet Graph --------------------------------------------------------------------------------------------------------------------------
+# ------------------------------- Page 4: Crochet Colorwork Grid Written Instruction Generator --------------------------------------------------------------------------------------------------------------------------
 # This page is an interactive interface where users can input a crochet colorwork grid, and it outputs the written instructions in the format:
     # Row 1: 2 white, 1 black, 2 white
     # Row 2: 3 white, 2 black, 3 white
 # Every odd row is crocheted from left to right, and every even row is crocheted from right to left. 
-        with ui.nav_panel('Crochet Graph'):
+        with ui.nav_panel('Crochet Colorwork Grid Written Instruction Generator'):
             with ui.card(style="max-width:850px; margin:auto;", class_="p-4"):
                 ui.card_header("About the Bust Circumference Calculator")
 
