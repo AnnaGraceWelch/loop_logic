@@ -50,11 +50,9 @@ def calculate_new_bust_circumference(stitch_gauge: float, total_bust_stitches: i
 
     '''
 
-    # Calculate new bust width
+    # Calculate new bust circumference
     return(total_bust_stitches/(stitch_gauge/10))
     
-from PIL import Image
-import numpy as np
 
 def load_crochet_graph(path):
     '''

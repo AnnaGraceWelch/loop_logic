@@ -3,14 +3,16 @@
 # Author: Anna Grace Welch
 # Date: 01/21/2026
 
-# "This script contains a shiny application to calculate amount of cast-on stitches based on knitting gauge and pattern specifications."
+# "This script contains a Shiny for Python application to assist knitters and crocheters in the crafting process."
 
 # Imports 
 #####################################################################################################################################################
 from shiny.express import input, render, ui
 from shiny import reactive
-from knitting_functions import calculate_stitches, to_cm, calculate_new_bust_circumference, get_unique_colors, load_crochet_graph, image_to_grid, row_to_instruction, format_row
+from knitting_functions import calculate_stitches, to_cm, calculate_new_bust_circumference, \
+get_unique_colors, load_crochet_graph, image_to_grid, row_to_instruction, format_row
 import matplotlib.pyplot as plt
+import shinyswatch
 
 # Functions
 #####################################################################################################################################################
@@ -19,183 +21,186 @@ def rgb_to_hex(rgb):
 
 # Style Set-Up
 #####################################################################################################################################################
-ui.page_opts(title="LoopLogic",
-             fillable=True)
+ui.page_opts(title="LoopLogic", 
+             theme=shinyswatch.theme.litera,
+             navbar_options=ui.navbar_options(bg="primary"))
 
-ui.tags.style("""
-body {
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #f8f9fb;
-}
+# ui.head_content(             
+# ui.tags.style(
+#     ""
+#     ".navbar { background: navBarColor01; }" \
+#     "")
+# )
 
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
 
-.card-header {
-    background: #4a6fa5 !important;
-    color: white !important;
-    font-weight: 600;
-    border-radius: 10px 10px 0 0;
-}
+# ui.head_content(
+#     ui.tags.style("""
+#     body {
+#         font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+#         background-color: #f8f9fb;
+#     }
+#     """)
+# )
 
-.result-box {
-    font-size: 1.3em;
-    font-weight: 600;
-    margin-top: 15px;
-    padding: 15px;
-    background: #eef4ff;
-    border-radius: 10px;
-}
+# .card {
+#     background: white;
+#     border-radius: 12px;
+#     padding: 15px;
+#     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+# 
+# .nav-tabs {
+#     background: #4a6fa5 ;
+#     border-radius: 12px;
+#     padding: 15px;
+#     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+# }
 
-/* Default state for tab links */
-.nav-link {
-    color: #000000 !important; 
-} 
+# .card-header {
+#     background: #4a6fa5 !important;
+#     color: white !important;
+#     font-weight: 600;
+#     border-radius: 10px 10px 0 0;
+# }
 
-/* Active/Selected tab */                 
-.nav-link.active { 
-    color: #FFFFFF !important; 
-} 
+# .result-box {
+#     font-size: 1.3em;
+#     font-weight: 600;
+#     margin-top: 15px;
+#     padding: 15px;
+#     background: #eef4ff;
+#     border-radius: 10px;
+# }
 
-/* Hover State */   
-.nav-link:hover { 
-    color: #3498db !important; 
-}  
-""")
+# /* Default state for tab links */
+# .nav-link {
+#     color: #000000 !important; 
+# } 
+
+# /* Active/Selected tab */                 
+# .nav-link.active { 
+#     color: #FFFFFF !important; 
+# } 
+
+# /* Hover State */   
+# .nav-link:hover { 
+#     color: #3498db !important; 
+# }  
+# """)
 
 # App
-####################################################################################################################################################
-# Centers the content on the page
-with ui.div(style="max-width: 800px; margin: auto;"):
+####################################################################################################################################################     
+# ------------------------------- Page 1: Welcome/About  --------------------------------------------------------------------------------------------------------------------------
 
-    with ui.navset_card_pill():
+with ui.nav_panel(title="Welcome"):
+    ui.markdown(
+        """
+        ## 🧶 **Welcome to LoopLogic!** 🧶
         
-# ------------------------------- Page 1 --------------------------------------------------------------------------------------------------------------------------
-        with ui.nav_panel("Welcome"):
-            ui.markdown(
-                """
-                ## 🧶 **Welcome to LoopLogic!** 🧶
-                
-                ### What is LoopLogic?
-                - LoopLogic is an interactive application designed to aid knitters and crocheters in the crafting process.
-                    It includes helpful features such as stitch calculators and written instruction generators.
-                    The current features are detailed in the sections below. 
-            
-
-                    Happy crafting! 😊
-
-                ---
-
-                ### Features:
-
-                #### Cast-on Stitch Calculator
-                - Calculates the cast-on stitches needed for garment to be a certain pattern size if user's gauge is different than pattern gauge.
-                - Also has the option to calculate cast-on stitches is user desires a bust circumference different than the pattern's sizes.
-                    
-                #### Bust Circumference Calculator
-                - Calculates the bust circumference of a specific garment from a pattern based on user's stitch gauge. 
-                    
-                #### Crochet Colorwork Grid Written Instruction Generator
-                - Generates written instructions from a crochet colorwork grid                        
-
+        ### What is LoopLogic?
+        - LoopLogic is an interactive application designed to aid kyounitters and crocheters in the crafting process.
+            It includes helpful features such as stitch calculators and written instruction generators.
+            The current features are detailed in the sections below. 
     
-                """
-            )
 
-# ------------------------------- Page 2 --------------------------------------------------------------------------------------------------------------------------
-        with ui.nav_panel("Cast-on Stitch Calculator"):
+            Happy crafting! 😊
 
-            with ui.card(style="max-width:850px; margin:auto;", class_="p-4"):
+        ---
+
+        ### Features:
+
+        #### Cast-on Stitch Calculator
+        - Calculates the cast-on stitches needed for garment to be a certain pattern size if user's gauge is different than pattern gauge.
+        - Also has the option to calculate cast-on stitches is user desires a bust circumference different than the pattern's sizes.
+            
+        #### Bust Circumference Calculator
+        - Calculates the bust circumference of a specific garment from a pattern based on user's stitch gauge. 
+            
+        #### Crochet Colorwork Grid Written Instruction Generator
+        - Generates written instructions from a crochet colorwork grid                        
+
+
+        """
+    )
+
+# ------------------------------- Page 2:  Cast-on Stitch Calculator --------------------------------------------------------------------------------------------------------------------------    
+
+# Navigation panel containing calculator for adjusting
+# cast-on stitches based on gauge differences and optional
+# size modification.
+with ui.nav_panel ("Knitting Tools"):
+    with ui.navset_tab():
+        with ui.nav_panel(title="Cast-on Stitch Calculator"):
+
+            # Provides explanation of calculator purpose and required inputs
+            with ui.card():
 
                 ui.card_header("About the Cast-on Stitch Calculator")
 
                 ui.markdown("""
-                                This calculator computes the cast-on stitches needed to reach pattern gauge.  
-                                It can also calculate stitches required to achieve a desired bust measurement.
+                This calculator computes the cast-on stitches needed to
+                reach pattern gauge and optionally adjust garment size.
+            
+                """)
 
-                                ---
-                                ## Required Inputs
-
-                                ### Pattern Gauge
-                                - Stitch gauge written in the pattern (stitches per 10 cm).
-
-                                **Example:**  
-                                17 sts × 26 rows = 10 × 10 cm → Input: **17**
-
-                                ---
-
-                                ### Your Gauge
-                                - Stitch gauge measured from your knitted swatch **after** blocking.
-
-                                **Example:**  
-                                18 sts = 10 cm → Input: **18**
-
-                                ---
-
-                                ### Cast-On Stitches
-                                - Number of stitches to cast on specified by the pattern.
-
-                                **Example:**  
-                                Pattern says cast on **92 stitches** → Input: **92**
-
-                                ---
-                                ## Optional Inputs
-
-                                ### (Optional) Pattern Bust Circumference
-                                - Finished garment bust size listed in the pattern.
-
-                                **Example:**  
-                                Size S = **113 cm** → Input: **113**
-
-                                ---
-
-                                ### (Optional) Desired Bust Circumference
-                                - Target bust size for the finished garment.
-
-                                **Example:**  
-                                You want a bust circumference of **115 cm** instead of 113 cm → Input: **115**
-
-                                This is an optional input because if your desired measurement matches another pattern size's dimensions, 
-                                                knitting that size is usually simpler than making your own calculations. 
-
-                                ---
-
-                                Enter required values (and optional values if needed) to calculate your cast-on stitches.
-            """)
-
+            # User enters pattern gauge and personal swatch gauge
             with ui.card():
                 ui.card_header("Gauge")
-                with ui.layout_columns():  
-                    ui.input_numeric("expected_stitches", "Pattern gauge (sts / 10 cm)", 0)
-                    ui.input_numeric("actual_stitches", "Your gauge (sts / 10 cm)", 0)
 
+                # Display inputs side-by-side
+                with ui.layout_columns():
+                    ui.input_numeric(
+                        "expected_stitches",
+                        "Pattern gauge (sts / 10 cm)",
+                        0
+                    )
+                    ui.input_numeric(
+                        "actual_stitches",
+                        "Your gauge (sts / 10 cm)",
+                        0
+                    )
+
+            # Number of stitches specified by original pattern
             with ui.card():
                 ui.card_header("Pattern")
-                ui.input_numeric("pattern_caston_sts", "Cast-on stitches", 0)
 
+                ui.input_numeric(
+                    "pattern_caston_sts",
+                    "Cast-on stitches",
+                    0
+                )
+
+
+            # Allows resizing garment based on desired bust measurement
             with ui.card():
                 ui.card_header("Optional Size Adjustment")
+
                 with ui.layout_columns():
-                    ui.input_numeric("expected_width", "Pattern bust circumference (optional)", value=None)
-                    ui.input_numeric("desired_width", "Desired bust circumference (optional)", value=None)
+                    ui.input_numeric(
+                        "expected_width",
+                        "Pattern bust circumference (optional)",
+                        value=None
+                    )
+                    ui.input_numeric(
+                        "desired_width",
+                        "Desired bust circumference (optional)",
+                        value=None
+                    )
 
 
+            # Currently disabled — future support for inches/cm conversion
+            # ui.input_radio_buttons(
+            #     "unit",
+            #     "Width units",
+            #     choices=["cm", "in"],
+            #     selected="cm",
+            #     inline=True,
+            # )
 
-
-            ui.input_radio_buttons(
-                "unit",
-                "Width units",
-                choices=["cm", "in"],
-                selected="cm",
-                inline=True,
-            )
-
+            # Reactive text output updating whenever inputs change
             @render.text
             def stitch_count():
+
+                # Prevent calculation if required fields are empty or zero
                 if any(
                     v in (None, 0)
                     for v in [
@@ -204,18 +209,27 @@ with ui.div(style="max-width: 800px; margin: auto;"):
                         input.pattern_caston_sts(),
                     ]
                 ):
-                    return "Enter pattern gauge, actual gauge, and pattern stitch count. Optionally, enter expected bust width \
-                        based on pattern and the desired bust width of the garment."
-                
+                    return (
+                        "Enter pattern gauge, actual gauge, and pattern stitch count. "
+                        "Optionally, enter expected and desired bust measurements."
+                    )
 
+                # Currently assumes cm; conversion logic prepared for later
                 unit = input.unit()
-                
-                if input.expected_width not in (None, 0) and input.desired_width not in (None, 0):
+
+                # Convert widths to centimeters if optional inputs exist
+                if (
+                    input.expected_width not in (None, 0)
+                    and input.desired_width not in (None, 0)
+                ):
                     expected_width_cm = to_cm(input.expected_width(), unit)
                     desired_width_cm = to_cm(input.desired_width(), unit)
                 else:
-                    expected_width_cm = desired_width_cm = None
+                    expected_width_cm = None
+                    desired_width_cm = None
 
+
+                # Computes adjusted cast-on stitch count
                 new_st_count = calculate_stitches(
                     input.expected_stitches(),
                     input.actual_stitches(),
@@ -223,48 +237,71 @@ with ui.div(style="max-width: 800px; margin: auto;"):
                     expected_width_cm,
                     desired_width_cm,
                 )
-                return f'You should cast on {new_st_count} stitches.'
 
-        
+
+                return f"You should cast on {new_st_count} stitches."
+
             
+                
 # ------------------------------- Page 3: Bust Circumference Calculator --------------------------------------------------------------------------------------------------------------------------
+# Navigation panel for computing finished garment bust circumference
+# when knitting with a different stitch gauge than the pattern gauge.
         with ui.nav_panel('Bust Circumference Calculator'):
 
-            with ui.card(style="max-width:850px; margin:auto;", class_="p-4"):
+            # Explains purpose and required inputs to the user
+            with ui.card():
                 ui.card_header("About the Bust Circumference Calculator")
 
                 ui.markdown("""
-                                This calculator computes the bust circumference in cm of a finished garment if you knit with a different stitch gauge than the pattern gauge.  
+                This calculator computes the bust circumference in cm of a finished garment
+                if you knit with a different stitch gauge than the pattern gauge.
 
-                                ---
-                                ## Required Inputs
+                ---
+                ## Required Inputs
 
-                                ### Your Stitch Gauge
-                                - Stitch gauge of your knitted swatch **after** blocking. 
+                ### Your Stitch Gauge
+                - Stitch gauge of your knitted swatch **after** blocking.
 
-                                **Example:**  
-                                18 sts × 26 rows = 10 × 10 cm → Input: **18**
+                **Example:**  
+                18 sts × 26 rows = 10 × 10 cm → Input: **18**
 
-                                ---
+                ---
 
-                                ### Total stitches around bust at widest point in pattern
-                                - Stitches at the widest point of the pattern's body section after all increases. 
+                ### Total stitches around bust at widest point in pattern
+                - Stitches at the widest point of the pattern's body section after all increases.
 
-                                **Example:**  
-                                At the end of body increases, you should have **192 stitches** on the needles. → Input: **192**
-                            
-                                ---
-                            
-                                Enter required values to calculate the bust circumference of finished garment if knit with your stitch gauge.
-                            """)
+                **Example:**  
+                At the end of body increases, you should have **192 stitches** on the needles. → Input: **192**
 
+                ---
+                Enter required values to calculate the bust circumference of the finished garment
+                if knit with your stitch gauge.
+                """)
+
+
+            # Collects user inputs for stitch gauge and total bust stitches
             with ui.card():
                 ui.card_header("Inputs")
-                ui.input_numeric("stitch_gauge", "Stitch gauge (stitches per 10 cm)", 0)
-                ui.input_numeric("total_bust_stitches", "Total stitches around bust at widest point in pattern", 0)
+
+                # User enters their swatch stitch gauge
+                ui.input_numeric(
+                    "stitch_gauge",
+                    "Stitch gauge (stitches per 10 cm)",
+                    0
+                )
+
+                # User enters total stitches at the bust in the pattern
+                ui.input_numeric(
+                    "total_bust_stitches",
+                    "Total stitches around bust at widest point in pattern",
+                    0
+                )
+
 
             @render.text
             def new_bust_circumference():
+
+                # Return prompt if required values are missing or zero
                 if any(
                     v == 0
                     for v in [
@@ -273,26 +310,34 @@ with ui.div(style="max-width: 800px; margin: auto;"):
                     ]
                 ):
                     return "Enter all values to calculate new bust circumference."
-                
+
+
+                # Compute new bust circumference based on user's stitch gauge
                 new_bust_circumference = calculate_new_bust_circumference(
                     input.stitch_gauge(),
                     input.total_bust_stitches()
                 )
 
-                return(f'Your garment would have a finished bust circumference of {new_bust_circumference} cm at this stitch gauge.')
+                # Display result in cm with explanatory text
+                return (
+                    f'Your garment would have a finished bust circumference of '
+                    f'{new_bust_circumference} cm at this stitch gauge.'
+                )
 
 
 
-# ------------------------------- Page 4: Crochet Colorwork Grid Written Instruction Generator --------------------------------------------------------------------------------------------------------------------------
+# ------------------------------- Page 4: Crochet Colorwork Grid Written Instruction Generator --------------------------------------------------------------------------------------------------------------------------       
+with ui.nav_panel("Crochet Tools"):
+    with ui.navset_tab():
         # Navigation panel containing the crochet instruction generator
-        with ui.nav_panel('Crochet Colorwork Grid Written Instruction Generator'):
+        with ui.nav_panel(title="Crochet Colorwork Grid Written Instruction Generator"):
 
             # --------------------------------------------------------
             # INFORMATION / ABOUT CARD
             # --------------------------------------------------------
             # Provides user instructions explaining required inputs
-            with ui.card(style="max-width:850px; margin:auto;", class_="p-4"):
-                ui.card_header("About the Bust Circumference Calculator")
+            with ui.card():
+                ui.card_header("About the Written Instruction Generator")
 
                 ui.markdown("""
                 This page creates written instructions from a crochet colorwork graph.
