@@ -97,7 +97,7 @@ with ui.nav_panel(title="Welcome"):
         ## 🧶 **Welcome to LoopLogic!** 🧶
         
         ### What is LoopLogic?
-        - LoopLogic is an interactive application designed to aid kyounitters and crocheters in the crafting process.
+        - LoopLogic is an interactive application designed to aid knitters and crocheters in the crafting process.
             It includes helpful features such as stitch calculators and written instruction generators.
             The current features are detailed in the sections below. 
     
